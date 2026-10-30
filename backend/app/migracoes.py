@@ -1,15 +1,3 @@
-"""Migrations: evolução do banco em scripts numerados.
-
-Cada arquivo de `sql/migrations/` (001_..., 002_..., ...) roda uma única
-vez, em ordem. Todas as pendentes rodam numa ÚNICA transação: se qualquer
-uma falhar, nenhuma é aplicada e o banco continua exatamente como estava
-(a versão anterior do sistema segue funcionando). A tabela
-`schema_migrations` guarda quais já foram aplicadas.
-
-Roda sozinho quando a API sobe (main.py). Para mudar o banco, crie o
-próximo arquivo numerado; nunca edite um que já foi aplicado.
-"""
-
 import logging
 from pathlib import Path
 
@@ -17,8 +5,6 @@ from app.db import get_pool
 
 PASTA = Path(__file__).resolve().parent.parent / "sql" / "migrations"
 
-# Número qualquer, fixo: impede que duas instâncias da API apliquem as
-# migrations ao mesmo tempo (a segunda espera a primeira terminar).
 _TRAVA = 4815162342
 
 log = logging.getLogger("uvicorn.error")
@@ -50,7 +36,7 @@ async def aplicar_migrations() -> list[str]:
                 for arquivo in sorted(PASTA.glob("[0-9][0-9][0-9]_*.sql"))
                 if arquivo.name[:3] not in ja_aplicadas
             ]
-            async with conn.transaction():  # tudo ou nada
+            async with conn.transaction():
                 for arquivo in pendentes:
                     await conn.execute(arquivo.read_text(encoding="utf-8"))
                     await conn.execute(

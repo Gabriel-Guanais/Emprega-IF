@@ -1,9 +1,3 @@
-"""Emprega IF - API REST (FastAPI).
-
-Sobe com:  uvicorn main:app --reload
-Docs em:   http://localhost:8000/docs
-"""
-
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -58,8 +52,6 @@ app.include_router(estatisticas.router)
 
 @app.get("/health", tags=["Infra"])
 async def health():
-    """Confirma que a API conversa com o PostgreSQL e diz se o envio de
-    e-mail está configurado (sem mostrar a chave)."""
     linha = await query_one("SELECT version() AS versao")
     return {
         "status": "ok",
